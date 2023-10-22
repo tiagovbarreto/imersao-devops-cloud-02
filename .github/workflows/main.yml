@@ -1,12 +1,12 @@
 name: CI-CD
-  
+
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:      
+  workflow_dispatch:
 
 jobs:
-  CI: 
+  CI:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout do repositorio
@@ -44,9 +44,6 @@ jobs:
       uses: Azure/k8s-deploy@v4.9
       with:
         manifests: |
-          ./kube-news/src/k8s/aws/*.yml
-        images: 
+          ./kube-news/src/k8s/aws/
+        images:
           tiagovalentimbarreto/kube-news:v-${{ github.run_number }}
-        
-    
-      
