@@ -23,7 +23,7 @@ jobs:
         file: ./kube-news/src/Dockerfile
         push: true
         tags: |
-          tiagovalentimbarreto/kube-news:v-${{ github.run_number }}
+          tiagovalentimbarreto/kube-news:v${{ github.run_number }}
           tiagovalentimbarreto/kube-news:latest
 
   CD:
@@ -46,4 +46,4 @@ jobs:
         manifests: |
           ./kube-news/src/k8s/aws/
         images:
-          tiagovalentimbarreto/kube-news:v-${{ github.run_number }}
+          tiagovalentimbarreto/kube-news:v${{ github.run_number }}
