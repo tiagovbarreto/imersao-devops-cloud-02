@@ -39,8 +39,14 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     - name: Configurar kubeconfig
-      run: echo "Configurar o kubeconfig"
+      run: aws eks update-kubeconfig --name audax-cluster --region us-east-1
     - name: Aplicar deploy
-      run: echo "Executar kubectl apply"
+      uses: Azure/k8s-deploy@v4.9
+      with:
+        manifests: |
+          ./kube-news/src/k8s/aws/*
+        images: 
+          tiagovalentimbarreto/kube-news:v-${{ github.run_number }}
+        
     
       
