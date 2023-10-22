@@ -7,25 +7,24 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
-}
-
-
 locals {
   name   = "audax-cluster"
   region = "us-east-1"
 
   vpc_cidr = "10.0.0.0/16"
 
-  azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnets = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  intra_subnets   = ["10.0.7.0/24", "10.0.8.0/24", "10.0.9.0/24"]
+  azs             = ["us-east-1a", "us-east-1b"]
+  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
+  intra_subnets   = ["10.0.5.0/24", "10.0.6.0/24"]
 
   tags = {
     Example = local.name
   }
+}
+
+provider "aws" {
+  region = local.region
 }
 
 module "vpc" {
@@ -43,16 +42,16 @@ module "vpc" {
   enable_nat_gateway = true
 
   tags =  {
-    "kubernetes.io/cluster/audax-cluster" = "shared"
+    "kubernetes.io/cluster/${local.name}" = "shared"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/audax-cluster" = "shared"
+    "kubernetes.io/cluster/${local.name}" = "shared"
     "kubernetes.io/role/elb" = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/audax-cluster" = "shared"
+    "kubernetes.io/cluster/${local.name}" = "shared"
     "kubernetes.io/role/internal-elb" = 1
   }
 
@@ -92,7 +91,7 @@ module "eks" {
   eks_managed_node_groups = {
     audax-cluster-wg = {
       min_size     = 1
-      max_size     = 3
+      max_size     = 2
       desired_size = 1
 
       instance_types = ["t3.large"]
@@ -104,11 +103,11 @@ module "eks" {
     }
   }
 
-  #Ref:
+  #Ref: fix bug
   #https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1986 
   #https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1810
   node_security_group_tags = {
-    "kubernetes.io/cluster/audax-cluster" = null
+    "kubernetes.io/cluster/${local.name}" = null
   }
 
   tags = local.tags
